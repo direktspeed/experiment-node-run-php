@@ -1,0 +1,12 @@
+{
+  "default": {
+    "vhost_use": "requirepath",
+    "template": "",
+    "templateSettings": {
+      "customCSS": "v1.css",
+      "background-color": "#841E1E",
+      "logo-url": "https://www.google.de//images/branding/googlelogo/2x/googlelogo_color_272x92dp.png",
+      "site_name": "default"
+    }
+  }
+}

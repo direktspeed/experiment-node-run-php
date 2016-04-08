@@ -1,0 +1,19 @@
+{
+    "server": {
+        "accessLog": "dssrv.log", // Log Requests
+        "workers": 10, // workers
+        "maxSockets": 100,
+        "deadBackendTTL": 30,
+        "tcpTimeout": 30,
+        "retryOnError": 3,
+        "deadBackendOn500": true,
+        "httpKeepAlive": false,
+        "staticDir": null
+    },
+    "http": {
+        "app": "app", // can be also array or JSON Object with
+        "port": 80,
+        "bind": [ "0.0.0.0" ]
+    },
+    "driver": "couchbase://"
+}

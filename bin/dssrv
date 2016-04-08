@@ -1,0 +1,109 @@
+#!/usr/bin/env sh
+':' //; exec "$(command -v nodejs || command -v node)" --expose-gc --always-compact -- "$0" "$@"
+
+'use strict';
+
+var cluster = require('cluster'),
+    path = require('path'),
+    util = require('util'),
+    fs = require('fs'),
+    argv = require('minimist')(process.argv.slice(2)),
+    // dscmsSettings = require('/app/lib/domainConfig'),
+    Config = require('/app/lib/config'),
+    master = require('../lib/master'),
+    Worker = require('../lib/worker');
+
+var help = [
+    'usage: dssrv [options]',
+    '',
+    'Starts a dssrv server',
+    '',
+    'options:',
+    '   -a, --app requirenameorurl  Name or Path of NodeJS Application for http https defaults',
+    '   -c, --config CONFIGFILE     Location of the configuration file',
+    '   -d, --dry                   Test configuration and exit (doesn\'t actually start dssrv)',
+    '   -h, --help                  Display help'
+].join('\n');
+
+if (argv.h || argv.help) {
+    return util.puts(help);
+}
+
+var configFile = argv.c || argv.config;
+if (!configFile) {
+    configFile = path.resolve(__dirname, '..', 'config', 'servers', 'config.json');
+    if (process.env.SETTINGS_FLAVOR !== undefined) {
+        configFile = configFile.replace(/\.json$/, '_' + process.env.SETTINGS_FLAVOR + '.json');
+    }
+}
+util.log('Loading config from ' + configFile);
+fs.readFile(configFile, function (err, data) {
+    if (err) {
+        throw new Error('Couldn\'t locate requested config file at: ' + configFile);
+    }
+    var config;
+    try {
+        config = new Config(data);
+    } catch (e) {
+        util.log('Failed loading your configuration!');
+        throw e;
+    }
+    // Wait for configuration to say ready...
+    config.once('ready', function () {
+        if (argv.d || argv.dry) {
+            util.log('Configuration file ok. Here is the result:');
+            util.log(config.inspect());
+            return;
+        }
+        if (argv.a || argv.app) {
+            config.http.app = argv.a
+        }
+
+        if (cluster.isMaster) {
+            // Run the master
+            var m = master(config);
+            m.run();
+            util.log('Server is running.');
+        } else {
+            // Run the worker
+            var w = new Worker(config);
+            w.run();
+        }
+    });
+});
+
+
+
+
+function start(err, domainSettings, config) {
+  // return console.log(typeof config)
+  global.os = require('os');
+  global.debug_info = '{ host: ' + os.hostname() + ', pid:' +  process.pid + ' ';
+
+  // require('/app/db.js')
+  // db = cb_dscms.Buckets.dscms
+/*
+  dscmsSettings = require('/app/lib/domainConfig')
+  dscmsSettings.setProvider(function cb(err, valueProvider){  
+    GLOBAL.Provider = valueProvider
+  })
+
+  GLOBAL.domainSettings = domainSettings;
+  console.log("DSCMS:START - %s", domainSettings)
+*/
+  if (cluster.isMaster) {
+        // Run the master
+        var m = master(config);
+        m.run();
+        util.log('Server is running.');
+  } else {
+        // Run the worker
+        var w = new Worker(config, domainSettings);
+        w.run();
+  }
+}
+
+// start(null, null, Config)
+
+// optain config and run start with it
+// dscmsSettings.set(start,argv)
