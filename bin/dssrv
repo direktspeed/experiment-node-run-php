@@ -9,7 +9,7 @@ var cluster = require('cluster'),
     fs = require('fs'),
     argv = require('minimist')(process.argv.slice(2)),
     // dscmsSettings = require('/app/lib/domainConfig'),
-    Config = require('/app/lib/config'),
+    Config = require('../lib/config'),
     master = require('../lib/master'),
     Worker = require('../lib/worker');
 
@@ -26,7 +26,7 @@ var help = [
 ].join('\n');
 
 if (argv.h || argv.help) {
-    return util.puts(help);
+    return console.log(help);
 }
 
 var configFile = argv.c || argv.config;
