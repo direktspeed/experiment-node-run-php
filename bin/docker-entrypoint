@@ -1,0 +1,59 @@
+#!/bin/bash
+set -e
+#pipefail
+#source ${GITLAB_RUNTIME_DIR}/functions
+
+[[ $DEBUG == true ]] && set -x
+
+if [ "${1:0:1}" = '-' ]; then
+	export DEBUG=*
+	# cd /app; git pull origin master
+	npm install
+    npm install $(ls node_modules | grep dssrv | grep -v domainSettings)
+	# npm install dssrv_videosite dssrv_templates
+	DEBUG=* node /app/bin/dssrv "$@"
+fi
+
+case ${1} in
+  start|update|reinstall)
+	export DEBUG=*
+    cd /app
+
+    case ${1} in
+      start)
+	    # exec gosu node "$@"	
+    	git pull origin master
+    	npm install
+    	npm install $(ls node_modules | grep dssrv | grep -v domainSettings | grep -v dssrv_lib)
+    	DEBUG=* node /app/bin/dssrv "$@"
+        #exec /usr/bin/supervisord -nc /etc/supervisor/supervisord.conf
+        ;;
+      update)
+    	cd /app
+    	git pull origin master
+    	npm install
+        ;;
+      reinstall)
+    	cd /app
+    	git pull origin master
+    	npm install
+    	npm install $(ls node_modules | grep dssrv | grep -v domainSettings  | grep -v dssrv_lib)
+        ;;
+#      app:rake)
+#        shift 1
+#        execute_raketask $@
+#        ;;
+    esac
+    ;;
+  help)
+    echo "Available options:"
+    echo " start        - Starts the gitlab server (default)"
+    echo " update       - Initialize the gitlab server (e.g. create databases, compile assets), but don't start it."
+    echo " reinstall    - Fix repository/builds directory permissions."
+    echo " help         - Displays the help"
+    echo " [command]        - Execute the specified command, eg. bash."
+    ;;
+  *)
+    exec "$@"
+    ;;
+esac
