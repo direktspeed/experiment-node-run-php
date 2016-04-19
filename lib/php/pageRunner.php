@@ -3,6 +3,7 @@
   if ( isset($_SERVER) && array_key_exists('QUERY_STRING', $_SERVER) ) {
     parse_str($_SERVER['QUERY_STRING'], $_GET);
   }
+  
   // For 4.3.0 <= PHP <= 5.4.0
   if (!function_exists('http_response_code'))
   {

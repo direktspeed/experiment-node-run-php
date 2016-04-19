@@ -56,7 +56,7 @@ fs.readFile(configFile, function (err, data) {
             return;
         }
         if (argv.a || argv.app) {
-            config.http.app = argv.a
+            config.http.use = argv.a
         }
 
         if (cluster.isMaster) {

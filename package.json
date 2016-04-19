@@ -10,6 +10,8 @@
   "license": "apache",
   "dependencies": {
     "debug": "^2.2.0",
+    "express": "^4.13.4",
+    "harp": "^0.20.3",
     "minimist": "^1.2.0"
   }
 }

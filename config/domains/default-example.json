@@ -1,6 +1,6 @@
 {
   "default": {
-    "vhost_use": "requirepath",
+    "use": "requirepath",
     "template": "",
     "templateSettings": {
       "customCSS": "v1.css",
